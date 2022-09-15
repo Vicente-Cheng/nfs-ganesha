@@ -1,7 +1,6 @@
 # Ganesha-Top - A tool for the information monitoring like top
 
-An idea that makes people easy to monitor information that included memory, CPU, MDCache, and Export/Client OP.
-(Now only support V4 Status)
+An idea that makes people easy to monitor information that included memory, CPU, MDCache, and Export/Client OP. (Now only support V4 Status)
 
 The whole screen could be split to three parts.
 
