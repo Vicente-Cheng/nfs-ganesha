@@ -2618,6 +2618,16 @@ enum netloc_type4 {
 };
 typedef enum netloc_type4 netloc_type4;
 
+struct netloc_server4 {
+	netloc_type4	nls_type;
+	union {
+		utf8str_cis nl4_name;
+		utf8str_cis nl4_url;
+		struct netaddr4 nl4_addr;
+	} u;
+};
+typedef struct netloc_server4 netloc_server4;
+
 enum data_content4 {
 	NFS4_CONTENT_DATA       = 0,
 	NFS4_CONTENT_HOLE       = 1,
@@ -2729,12 +2739,8 @@ struct COPY4args {
 	offset4         ca_src_offset;
 	offset4         ca_dst_offset;
 	length4         ca_count;
-	netloc_type4        ca_type;
-	union {
-		utf8str_cis ca_name;
-		utf8str_cis ca_url;
-		netaddr4    ca_addr;
-	};
+	uint32_t        ca_sync;
+	netloc_server4  ca_source_server;
 };
 typedef struct COPY4args COPY4args;
 
@@ -8094,6 +8100,59 @@ static inline bool xdr_DEALLOCATE4args(XDR *xdrs, DEALLOCATE4args *objp)
 	return true;
 }
 
+static inline bool xdr_COPY4args(XDR *xdrs, COPY4args *objp)
+{
+	//uint32_t server_lists = 0;
+	if (!xdr_stateid4(xdrs, &objp->ca_src_stateid))
+		return false;
+	if (!xdr_stateid4(xdrs, &objp->ca_dst_stateid))
+		return false;
+	if (!xdr_offset4(xdrs, &objp->ca_src_offset))
+		return false;
+	if (!xdr_offset4(xdrs, &objp->ca_dst_offset))
+		return false;
+	if (!xdr_length4(xdrs, &objp->ca_count))
+		return false;
+	if (!xdr_uint32_t(xdrs, &objp->ca_sync))
+	    return false;
+	return true;
+}
+
+static inline bool xdr_COPY4resok(XDR *xdrs, write_response4 *objp)
+{
+        if (!xdr_count4(xdrs, &objp->wr_ids))
+                return false;
+        if (objp->wr_ids > 1)
+                return false;
+        if (objp->wr_ids == 1)
+                if (!xdr_stateid4(xdrs, &objp->wr_callback_id))
+                        return false;
+        if (!xdr_length4(xdrs, &objp->wr_count))
+                return false;
+        if (!xdr_stable_how4(xdrs, &objp->wr_committed))
+                return false;
+        if (!xdr_verifier4(xdrs, objp->wr_writeverf))
+                return false;
+        return true;
+}
+
+static inline bool xdr_COPY4res(XDR *xdrs, COPY4res *objp)
+{
+	if (!xdr_nfsstat4(xdrs, &objp->cr_status))
+		return false;
+	switch (objp->cr_status) {
+	case NFS4_OK:
+		if (!xdr_COPY4resok(xdrs, &objp->COPY4res_u.cr_resok4))
+			return false;
+		if (!xdr_length4(xdrs, &objp->COPY4res_u.cr_bytes_copied))
+			return false;
+		break;
+	default:
+		break;
+	}
+	return true;
+}
+
 static inline bool xdr_data_contents(XDR *xdrs, contents *objp)
 {
 	if (!inline_xdr_enum(xdrs, (enum_t *)&objp->what))
@@ -8561,8 +8620,12 @@ static inline bool xdr_nfs_argop4(XDR *xdrs, nfs_argop4 *objp)
 				&objp->nfs_argop4_u.oplayoutstats))
 			return false;
 		break;
-
 	case NFS4_OP_COPY:
+		if (!xdr_COPY4args(xdrs,
+				&objp->nfs_argop4_u.opcopy))
+			return false;
+		break;
+
 	case NFS4_OP_COPY_NOTIFY:
 	case NFS4_OP_OFFLOAD_CANCEL:
 	case NFS4_OP_OFFLOAD_STATUS:
@@ -8891,8 +8954,12 @@ static inline bool xdr_nfs_resop4(XDR *xdrs, nfs_resop4 *objp)
 					 &objp->nfs_resop4_u.oplayoutstats))
 			return false;
 		break;
-
 	case NFS4_OP_COPY:
+		if (!xdr_COPY4res(xdrs,
+					 &objp->nfs_resop4_u.opcopy))
+			return false;
+		break;
+
 	case NFS4_OP_COPY_NOTIFY:
 	case NFS4_OP_OFFLOAD_CANCEL:
 	case NFS4_OP_OFFLOAD_STATUS:

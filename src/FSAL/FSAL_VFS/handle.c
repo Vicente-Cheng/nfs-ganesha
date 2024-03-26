@@ -1771,6 +1771,7 @@ void vfs_handle_ops_init(struct fsal_obj_ops *ops)
 	ops->reopen2 = vfs_reopen2;
 	ops->read2 = vfs_read2;
 	ops->write2 = vfs_write2;
+	ops->copy_file_range = vfs_copy_file_range;
 #ifdef __USE_GNU
 	ops->seek2 = vfs_seek2;
 #endif

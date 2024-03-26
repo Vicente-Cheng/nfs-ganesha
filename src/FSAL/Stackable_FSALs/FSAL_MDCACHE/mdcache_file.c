@@ -914,3 +914,24 @@ fsal_status_t mdcache_fallocate(struct fsal_obj_handle *obj_hdl,
 
 	return status;
 }
+
+fsal_status_t mdcache_copy_file_range(struct fsal_obj_handle *src_obj_hdl,
+				uint64_t src_offset, struct fsal_obj_handle *dst_obj_hdl,
+				uint64_t dst_offset, uint64_t count) {
+    LogInfo(COMPONENT_MDCACHE,
+		    "Calling into mdcache copy file range");
+	mdcache_entry_t *src_entry =
+		container_of(src_obj_hdl, mdcache_entry_t, obj_handle);
+	mdcache_entry_t *dst_entry =
+		container_of(dst_obj_hdl, mdcache_entry_t, obj_handle);
+	
+	fsal_status_t status;
+
+	subcall(
+		status = src_entry->sub_handle->obj_ops->copy_file_range(
+							src_entry->sub_handle,
+							src_offset, dst_entry->sub_handle,
+							dst_offset, count);
+	       );
+	return status; 
+}

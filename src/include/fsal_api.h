@@ -2010,6 +2010,26 @@ struct fsal_obj_ops {
 	 fsal_status_t (*fallocate)(struct fsal_obj_handle *obj_hdl,
 				    struct state_t *state, uint64_t offset,
 				    uint64_t length, bool allocate);
+
+/**
+ * @brief Copy a range of data from on to another
+ *
+ * This function copy a range of data from one to another.
+ *
+ * @param[in] src_obj_hdl source file
+ * @param[in] src_offset  source offset
+ * @param[in] dst_obj_hdl destination file
+ * @param[in] dst_offset  destination offset
+ * @param[in] count       number of bytes to copy
+ *
+ * @return FSAL status
+ */
+	 fsal_status_t (*copy_file_range)(struct fsal_obj_handle *src_obj_hdl,
+					uint64_t src_offset,
+					struct fsal_obj_handle *dst_obj_hdl,
+					uint64_t dst_offset,
+					uint64_t count);
+
 /**@}*/
 
 /**@{*/

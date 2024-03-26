@@ -1521,6 +1521,7 @@ void mdcache_handle_ops_init(struct fsal_obj_ops *ops)
 	ops->handle_to_wire = mdcache_handle_to_wire;
 	ops->handle_to_key = mdcache_handle_to_key;
 	ops->handle_cmp = mdcache_handle_cmp;
+	ops->copy_file_range = mdcache_copy_file_range;
 
 	/* pNFS */
 	ops->layoutget = mdcache_layoutget;

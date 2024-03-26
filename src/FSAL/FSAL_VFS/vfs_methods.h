@@ -321,6 +321,10 @@ void vfs_write2(struct fsal_obj_handle *obj_hdl,
 		struct fsal_io_arg *write_arg,
 		void *caller_arg);
 
+fsal_status_t vfs_copy_file_range(struct fsal_obj_handle *src_obj_hdl,
+				uint64_t src_offset, struct fsal_obj_handle *dst_obj_hdl,
+				uint64_t dst_offset, uint64_t count);
+
 #ifdef __USE_GNU
 fsal_status_t vfs_seek2(struct fsal_obj_handle *obj_hdl,
 			struct state_t *state,

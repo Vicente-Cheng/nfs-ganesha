@@ -2352,3 +2352,11 @@ fsal_status_t vfs_close2(struct fsal_obj_handle *obj_hdl,
 
 	return close_fsal_fd(obj_hdl, &my_fd->fsal_fd, false);
 }
+
+fsal_status_t vfs_copy_file_range(struct fsal_obj_handle *src_obj_hdl,
+				uint64_t src_offset, struct fsal_obj_handle *dst_obj_hdl,
+				uint64_t dst_offset, uint64_t count) {
+    LogInfo(COMPONENT_MDCACHE,
+		    "Calling into vfs copy file range");
+	return fsalstat(ERR_FSAL_NOTSUPP, 0);
+}
